@@ -5,7 +5,7 @@ import os
 import logging
 import traceback
 
-
+logging.basicConfig(level=logging.INFO)
 load_dotenv()
 
 provider = os.getenv("BALTIC_W3_HTTP_PROVIDER")
@@ -14,10 +14,11 @@ contract_abi = os.getenv("BALTIC_CONTRACT_ABI")
 owner_public_key = os.getenv("BALTIC_OWNER_PUBLIC_KEY_ADDRESS")
 private_key = os.getenv("BALTIC_PRIVATE_KEY")
 
-
 def run_balwap():
     w3 = Web3(Web3.HTTPProvider(provider))
-    baltic = w3.eth.contract(contract_address,abi=contract_abi)
+    address = "0xd07eF322ac2dA760797C7EA92dd34708A5d792Ce"
+    checksum_address = Web3.to_checksum_address(address)
+    baltic = w3.eth.contract(checksum_address,abi=contract_abi)
     nonce = w3.eth.get_transaction_count(owner_public_key) 
     addresses = []
     i=0
@@ -41,9 +42,9 @@ def run_balwap():
             )
             
             sign_transaction = w3.eth.account.sign_transaction(balwap_txn,private_key=private_key)
-            print(w3.to_hex(sign_transaction.hash))
+            logging.info(w3.to_hex(sign_transaction.hash))
             w3.eth.send_raw_transaction(sign_transaction.rawTransaction)
-            threading.Timer(1*60*60,run_balwap).start()
+            threading.Timer(1*10*60,run_balwap).start()
         except:
             logging.error(traceback.format_exc())
 

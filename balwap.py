@@ -16,7 +16,7 @@ private_key = os.getenv("BALTIC_PRIVATE_KEY")
 
 def run_balwap():
     w3 = Web3(Web3.HTTPProvider(provider))
-    address = "0xd07eF322ac2dA760797C7EA92dd34708A5d792Ce"
+    address = contract_address
     checksum_address = Web3.to_checksum_address(address)
     baltic = w3.eth.contract(checksum_address,abi=contract_abi)
     nonce = w3.eth.get_transaction_count(owner_public_key) 
@@ -44,7 +44,7 @@ def run_balwap():
             sign_transaction = w3.eth.account.sign_transaction(balwap_txn,private_key=private_key)
             logging.info(w3.to_hex(sign_transaction.hash))
             w3.eth.send_raw_transaction(sign_transaction.rawTransaction)
-            threading.Timer(1*10*60,run_balwap).start()
+            threading.Timer(1*5*60,run_balwap).start()
         except:
             logging.error(traceback.format_exc())
 
